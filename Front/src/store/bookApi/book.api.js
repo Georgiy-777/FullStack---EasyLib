@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { axiosService } from '../apiService/axiosService';
 import { easyLibApi } from '../apiService/easyLibApi';
 import { bookActions, booksActions } from '../bookApi/book.slice';
@@ -17,12 +18,9 @@ const bookApi = easyLibApi.injectEndpoints({
         createBook: builder.mutation({
             async queryFn(incomeData, { dispatch }) {
                 try {
-                    console.log('🚀 ~ queryFn ~ incomeData:', incomeData);
 
-                    const { data } = await axiosService.post(`/api/book`, {
-                        ...incomeData,
-                    });
-                    console.log('🚀 ~ queryFn ~ data:', data);
+                    const { data } = await axiosService.post(`/api/book`, incomeData,
+                    );
 
                     return { data: true };
                 } catch (error) {
@@ -50,12 +48,10 @@ const bookApi = easyLibApi.injectEndpoints({
         updateBook: builder.mutation({
             async queryFn(incomeData, { dispatch }) {
                 try {
-                    console.log('🚀 ~ queryFn ~ incomeData:', incomeData);
 
-                    const { data } = await axiosService.put(`/api/book`, {
+                    const { data } = await axiosService.put(`/api/book/${incomeData.id}`, {
                         ...incomeData,
                     });
-                    console.log('🚀 ~ queryFn ~ data:', data);
 
                     return { data: true };
                 } catch (error) {
@@ -71,7 +67,6 @@ const bookApi = easyLibApi.injectEndpoints({
                 try {
                     const { data } = await axiosService.get(`/api/book`);
 
-                    console.log('🚀 ~ queryFn ~ data:', data);
                     if (data) {
                         dispatch(booksActions.setBooks(data));
                     } else {
@@ -91,7 +86,6 @@ const bookApi = easyLibApi.injectEndpoints({
                         `/api/book/${options.id}`,
                     );
 
-                    console.log('🚀 ~ queryFn ~ data:', data);
                     if (data) {
                         dispatch(booksActions.setBook(data));
                     } else {

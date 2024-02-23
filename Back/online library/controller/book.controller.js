@@ -2,6 +2,7 @@ const db = require('../db');
 const fs = require('fs');
 const util = require('util');
 const readFile = util.promisify(fs.readFile); // Зробити fs.readFile, який повертає проміс
+const unlinkAsync = util.promisify(fs.unlink);
 // const knex = require('knex');
 // // Create database object
 // const pg = knex(
@@ -18,75 +19,87 @@ const readFile = util.promisify(fs.readFile); // Зробити fs.readFile, я�
 //     }
 // );
 class BookController {
+
     async createBook(req, res) {
         try {
-            const {title, author,  description} = req.body;
-            const newBook = await db.query('INSERT INTO books (title, author, description) values ($1, $2, $3) RETURNING *', [title, author, description]);
-            res.json(newBook.rows[0]);
-            console.log('newBook', newBook.rows[0]);
-            return newBook.rows[0]?.id;
-        }catch (e) {
-            throw new Error(e);
-        }
-
-    }
-
-
-
-    async uploadImage(req, res) {
-        try {
-            let imageBuffer = null; // Ініціалізуємо змінну для буфера зображення як null
+            const { title, author, description } = req.body;
+            let imageBuffer = null;
 
             // Перевіряємо, чи файл був завантажений
             if (req.file) {
-                const { filename,  mimetype,  size,  path } = req.file;
-                console.log('SDFSDFDSF',req.file)
-                // const filepath = req.file.path;
-                const { id } = req.params;
-
                 // Читання файлу і його конвертація в буфер
                 imageBuffer = await readFile(req.file.path);
-                    console.log('imageBuffer', imageBuffer)
-                // Видалення тимчасового файлу
-                 await db.query('UPDATE books SET  image = $1, filename = $2, mimetype = $3, size = $4, path = $5 WHERE id = $6 RETURNING *', [ filename, filename,  mimetype,  size,  path,  id]);
-                console.log(req.file);
-                res.json('/image api')
-                fs.unlinkSync(req.file.path);
 
+                // Видалення тимчасового файлу після завантаження
+                await unlinkAsync(req.file.path);
             }
 
-            // Вставка даних книги в БД, навіть якщо зображення не надано
+            // Вставка даних книги та зображення в БД
+            const newBook = await db.query(
+                'INSERT INTO books (title, author, description, image) VALUES ($1, $2, $3, $4) RETURNING *',
+                [title, author, description, imageBuffer]
+            );
 
+            res.json(newBook.rows[0]);
+            return newBook.rows[0]?.id;
         } catch (e) {
-          throw new Error(e);
+            console.error(e);
+            res.status(500).send('Server error');
         }
     }
+
     async getBooks(req, res) {
         try {
-            const books = await db.query('SELECT * FROM books');
-            res.json(books.rows);
-            return books.rows;
-        }catch (e) {
-            throw new Error(e);
+            const { rows } = await db.query('SELECT id, title, author, description, image FROM books');
+            const booksWithImages = rows?.map(book => {
+                if (book.image) {
+                    // Конвертація BLOB зображення у рядок base64
+                    const imageBase64 = Buffer.from(book.image).toString('base64');
+                    // Припускаючи, що всі зображення у форматі PNG. Якщо формат може бути різним,
+                    // вам потрібно також зберігати і відправляти інформацію про MIME-тип
+                    book.image = `data:image/png;base64,${imageBase64}`;
+                }
+                return book;
+            });
+            res.json(booksWithImages);
+            return booksWithImages;
+        } catch (e) {
+            console.error(e);
+            res.status(500).send('Server error');
         }
-
-
     }
+
+
     async getOneBook(req, res) {
-          try {
-                const id = req.params.id;
-                const book = await db.query('SELECT * FROM books WHERE id = $1', [id]);
+        try {
+            const id = req.params.id;
+            const book = await db.query('SELECT id, title, author, description, image FROM books WHERE id = $1', [id]);
+            if (book.rows.length > 0) {
+                let bookData = book.rows[0];
+                if (bookData.image) {
+                    // Конвертація BLOB зображення у рядок base64
+                    const imageBase64 = Buffer.from(bookData.image).toString('base64');
+                    bookData.image = `data:image/png;base64,${imageBase64}`;
+                }
+                res.json(bookData);
+                return bookData
+            } else {
+                res.status(404).send('Книга не знайдена');
                 res.json(book.rows[0]);
                 return book.rows[0];
-            }catch (e) {
-                throw new Error(e);
             }
-
+        } catch (e) {
+            res.status(500).send('Server error');
+            console.error(e);
+        }
     }
+
+
       async updateBook(req, res) {
         try {
-            const {id, title, author, image, description} = req.body;
-            const book = await db.query('UPDATE books SET title = $1, author = $2, image = $3, description = $4 WHERE id = $5 RETURNING *', [title, author, image, description, id]);
+            const {title, author,  description} = req.body;
+            const id = req.params.id;
+            const book = await db.query('UPDATE books SET title = $1, author = $2, description = $3 WHERE id = $4 RETURNING *', [title, author, description, id]);
             res.json(book.rows[0]);
         }catch (e) {
             throw new Error(e);
