@@ -10,9 +10,7 @@ https://www.loom.com/share/0c9c0499b9774a1fa60a65fc7cb34c09?sid=4976b49f-6ba2-46
 
 
 Add upload image
-https://www.loom.com/share/aeeab5fbc0654e348eea4b8c799ebf01?sid=1eaf5594-697b-4a42-979e-02d3d2bab076
-
-
+https://www.loom.com/share/aeeab5fbc0654e348eea4b8c799ebf01?sid=5e6048fc-75f4-4e0e-a463-36047327069a
 ## Description
 
 [Documentation](https://linktodocumentation)
