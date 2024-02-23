@@ -34,7 +34,6 @@ const BookList = () => {
     const router = useRouter();
 
     const listBooks = useSelector(booksSelectors.getBooks());
-    console.log('🚀 ~ Library ~ listBooks:', listBooks);
 
     React.useEffect(() => {
         getAllBooks();
@@ -62,8 +61,7 @@ const BookList = () => {
                                         height: { xs: 100, sm: 160, md: 180 },
                           
                                     }}
-                                    image={
-                                        'https://source.unsplash.com/random?books'
+                                    image={item?.image ||'https://source.unsplash.com/random?books'
                                     }
                                     alt={'book image'}
                                 />

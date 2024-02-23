@@ -15,7 +15,6 @@ const BookItem = () => {
     const { id } = params;
 
     const itemBook = useSelector(booksSelectors.getBook());
-    console.log('🚀 ~ BookItem ~ itemBook:', itemBook);
     React.useEffect(() => {
         getOneBookById({
             id,
@@ -38,7 +37,7 @@ const BookItem = () => {
                     width: { xs: 180, sm: 220, md: 260 },
                     height: { xs: 200, sm: 260, md: 280 },
                 }}
-                image={'https://source.unsplash.com/random?books'}
+                image={itemBook?.image || 'https://source.unsplash.com/random?books'}
                 alt={'book image'}
             />
         </Stack>

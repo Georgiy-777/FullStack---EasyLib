@@ -38,7 +38,6 @@ export default function UpdateBookModal({ isOpen, onClose, item }) {
         formState: { errors },
     } = useForm();
     const onSubmit = async data => {
-        console.log(data);
         const res = await updateBook({
             id: Number(item?.id),
             title: data?.title,

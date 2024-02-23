@@ -34,13 +34,27 @@ export default function CreateBookModal({ isOpen, onClose }) {
         handleSubmit,
         formState: { errors },
     } = useForm();
+   
     const onSubmit = async data => {
-        console.log(data);
-        const res = await createBook({
-            title: data?.title,
-            author: data?.author,
-            description: data?.description,
-        });
+        const formData = new FormData();
+
+        // Додавання текстових полів
+        formData.append('title', data.title);
+        formData.append('author', data.author);
+        formData.append('description', data.description);
+
+        // Додавання файлу, якщо він вибраний
+        if (data.image) {
+            formData.append('image', data.image);
+        }
+        // Логування вмісту FormData
+        for (let [key, value] of formData.entries()) {
+            console.log(`${key}:`, value);
+        }
+
+        // Тут ви використовуєте ваш API для відправлення formData
+        const res = await createBook(formData); // Переконайтеся, що ваш API підтримує обробку FormData
+
         if (res) {
             onClose(), reset();
         } else {
@@ -107,7 +121,30 @@ export default function CreateBookModal({ isOpen, onClose }) {
                             <span>This feld is required</span>
                         )}
                     </div>
+                    <div>
+                        <StyledLabel htmlFor="image">Image:</StyledLabel>
 
+                        <Controller
+                            control={control}
+                            name={'image'}
+                            // rules={{ required: "Recipe picture is required" }}
+                            render={({
+                                field: { value, onChange, ...field },
+                            }) => {
+                                return (
+                                    <Input
+                                        {...field}
+                                        value={value?.fileName}
+                                        onChange={event => {
+                                            onChange(event.target.files[0]);
+                                        }}
+                                        type="file"
+                                        id="image"
+                                    />
+                                );
+                            }}
+                        />
+                    </div>
                     <Button
                         sx={{
                             width: '100%',
