@@ -5,10 +5,7 @@ FullStack demo project /Use Stack: NextJs ExpressJs PostgresSQL Jest
 
 ## Demo
 
-https://www.loom.com/share/0c9c0499b9774a1fa60a65fc7cb34c09?sid=4976b49f-6ba2-463e-8d99-ee726f4735a9
 
-
-Add upload image
 https://www.loom.com/share/aeeab5fbc0654e348eea4b8c799ebf01?sid=5e6048fc-75f4-4e0e-a463-36047327069a
 ## Description
 
