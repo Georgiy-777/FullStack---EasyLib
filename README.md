@@ -9,11 +9,11 @@ FullStack demo project /Use Stack: NextJs ExpressJs PostgresSQL Jest
 https://www.loom.com/share/aeeab5fbc0654e348eea4b8c799ebf01?sid=5e6048fc-75f4-4e0e-a463-36047327069a
 ## Description
 
-The Back folder contains the online library directory which can be run with 
+The Back folder contains the back directory which can be run with 
                         npm run dev 
 to start the local server.
 
-The Front folder contains the Easylib directory which can be run with 
+The Front folder contains the client directory which can be run with 
                         npm run dev 
 to start the NextJs project.
 
